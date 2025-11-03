@@ -1,0 +1,16 @@
+<!-- The Capsule - refined monogram favicon -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="The Capsule favicon">
+  <!-- Tile -->
+  <rect x="4" y="4" width="56" height="56" rx="14"
+        fill="#FAF9F7" stroke="#E8E5E1" stroke-width="1.25"/>
+  <!-- Monogram C -->
+  <path d="M44 22
+           A14 14 0 1 0 44 42"
+        fill="none"
+        stroke="#2B2A29"
+        stroke-width="6"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- Chic accent dot -->
+  <circle cx="45" cy="22" r="2.2" fill="#C0B6A4"/>
+</svg>
