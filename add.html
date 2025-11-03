@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>The Capsule | Add Item</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Favicons -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="index.html">The Capsule</a>
+      <nav aria-label="Primary">
+        <ul class="nav">
+          <li><a href="index.html">Closet</a></li>
+          <li><a aria-current="page" href="add.html">Add Item</a></li>
+          <li><a href="builder.html">Builder</a></li>
+          <li><a href="outfit.html">Outfit</a></li>
+          <li><a href="planner.html">Planner</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container narrow">
+    <header class="page-head">
+      <h1 class="h1">Add Item</h1>
+      <p class="muted">Static form to capture new pieces for your capsule wardrobe.</p>
+    </header>
+
+    <section class="card" aria-labelledby="add-form-title">
+      <h2 id="add-form-title" class="h2">Details</h2>
+      <form class="stack" action="#" method="post">
+        <div class="form-control">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="e.g., Poplin Shirt" />
+        </div>
+
+        <div class="form-control">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option>Top</option>
+            <option>Bottom</option>
+            <option>Outer</option>
+            <option>Shoes</option>
+            <option>Accessory</option>
+          </select>
+        </div>
+
+        <fieldset class="form-control">
+          <legend>Color</legend>
+          <div class="swatches">
+            <input type="radio" id="c-ivory" name="color" />
+            <label for="c-ivory" class="swatch sw-ivory" aria-label="Ivory"></label>
+
+            <input type="radio" id="c-black" name="color" />
+            <label for="c-black" class="swatch sw-black" aria-label="Black"></label>
+
+            <input type="radio" id="c-blue" name="color" />
+            <label for="c-blue" class="swatch sw-blue" aria-label="Blue denim"></label>
+
+            <input type="radio" id="c-beige" name="color" />
+            <label for="c-beige" class="swatch sw-beige" aria-label="Beige"></label>
+          </div>
+        </fieldset>
+
+        <div class="form-control hint">
+          <label for="price">Price</label>
+          <input id="price" name="price" type="number" inputmode="numeric" placeholder="0" />
+          <small class="muted">Enter a whole number in USD.</small>
+        </div>
+
+        <div class="form-control">
+          <label for="photo">Photo</label>
+          <div id="photo" class="dropzone" role="img" aria-label="Dropzone for item photo, static mock">
+            <span>Drop image here or choose file</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn">Save</button>
+          <a class="btn ghost" href="index.html">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bar">
+      <small>© 2025 Jackie Tran • <a href="mailto:jackie28@uw.edu">Contact</a></small>
+    </div>
+  </footer>
+</body>
+</html>
