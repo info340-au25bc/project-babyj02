@@ -1,42 +1,16 @@
-# The Capsule — INFO 340 Project
+# React + Vite
 
-This repository contains code for **The Capsule**, an interactive wardrobe web app built for the _Client-Side Web Development_ course (UW iSchool, INFO 340). The Capsule helps you add clothing items, build outfits, and plan weekly looks with client-side interactivity and Firebase-backed data persistence.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-**Author:** Jackie Tran • `jackie28@uw.edu`
+Currently, two official plugins are available:
 
----
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Overview
-The Capsule treats a closet like data you can organize and remix. Add items with a simple form, build outfits in a visual canvas, save them, and (optionally) assign outfits to days on a weekly planner. The project focuses on meaningful interaction, accessible HTML, responsive CSS, and a clear React component structure.
+## React Compiler
 
-### Core Interactive Features (meets 2.5 requirement)
-1. **Add Clothing (Form):** multi-input form creates items and updates the closet grid without a page reload.  
-2. **Outfit Builder:** select or drag items into an outfit canvas; live preview shows color swatches and totals; save outfit.  
-3. **Planner (Half Feature):** assign saved outfits to Mon–Sun via drag-drop or date selector; updates immediately.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### Routes
-- `/closet` — items grid with filters  
-- `/builder` — visual outfit builder  
-- `/outfit/:id` — outfit detail (path param)  
-- `/planner` — weekly planner (optional)  
-- `*` — NotFound
+## Expanding the ESLint configuration
 
-### Data Model (Firebase Realtime Database)
-- `items/{itemId}`: `{ ownerUid, name, category, color, price, imgUrl }`  
-- `outfits/{outfitId}`: `{ ownerUid, name, itemIds[], formality, warmth, totalPrice, palette[], createdAt }`  
-- `planner/{uid}/{yyyy-mm-dd}`: `"outfitId"`  
-_Optional_: Firebase Storage for item photos.
-
-### Tech Stack
-- **Vite** + **React** + **react-router-dom**  
-- **Firebase Realtime Database** (+ optional Storage, Auth)  
-- One third-party React component (e.g., drag-and-drop or small chart) used meaningfully  
-- Responsive CSS (grid/flex + media queries) and accessible HTML
-
----
-
-## Setup
-1. Clone the repo and install dependencies:
-   ```bash
-   npm install
-   npm run dev
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

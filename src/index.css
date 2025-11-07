@@ -1,0 +1,49 @@
+/* src/index.css — minimal theme so it looks like your mock */
+:root{
+  --bg:#FAF9F7;
+  --surface:#FFFFFF;
+  --ink:#2B2A29;
+  --muted:#6E6A67;
+  --line:#E8E5E1;
+  --accent:#C0B6A4;
+  --accent-ink:#3A3733;
+  --radius-card:20px;
+  --radius-input:12px;
+  --radius-pill:9999px;
+  --shadow:0 1px 1px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:16px/1.5 "Inter","SF Pro Text",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  letter-spacing:.012em;
+}
+
+/* layout helpers */
+.container{max-width:1120px;margin:0 auto;padding:0 var(--space-5)}
+
+/* header + footer */
+.site-header{
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:10;
+}
+.header-bar{display:flex;align-items:center;gap:var(--space-5);height:64px}
+.brand{font-weight:700;color:var(--ink);text-decoration:none}
+.nav{list-style:none;display:flex;gap:var(--space-4);margin:0;padding:0}
+.nav a{display:inline-block;padding:6px 12px;border:1px solid transparent;border-radius:12px;color:var(--ink);text-decoration:none}
+.nav a.active,.nav a[aria-current="page"]{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.nav a:hover{border-color:var(--line)}
+
+.site-footer{border-top:1px solid var(--line);margin-top:64px}
+.site-footer .container{padding:24px var(--space-5);color:var(--muted)}
+a{color:var(--accent-ink)}
+
+/* responsive tweaks */
+@media (min-width:600px){ .header-bar{height:72px} }
+@media (min-width:1024px){ .container{max-width:1200px} }
