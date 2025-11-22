@@ -9,8 +9,8 @@ import Builder from './pages/Builder.jsx';
 import Outfit from './pages/Outfit.jsx';
 import Planner from './pages/Planner.jsx';
 
-// Use your original stylesheet
-import '../css/style.css';
+// use the React app css (remove ../css/style.css)
+import './index.css';
 
 const router = createBrowserRouter([
   {

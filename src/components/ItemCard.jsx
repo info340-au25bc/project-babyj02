@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function ItemCard({ src, alt, name, category, color, price }) {
   return (
     <article className="card item">
@@ -12,7 +14,7 @@ export default function ItemCard({ src, alt, name, category, color, price }) {
           <li className="chip">{color}</li>
           <li className="chip pill">All season</li>
         </ul>
-        <a className="btn ghost" href="/builder">Add to Builder</a>
+        <Link className="btn ghost" to="/builder">Add to Builder</Link>
       </div>
     </article>
   );
