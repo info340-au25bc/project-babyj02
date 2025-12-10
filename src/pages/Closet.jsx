@@ -1,79 +1,152 @@
-import { useMemo, useState } from 'react';
-import ItemCard from '../components/ItemCard.jsx';
-import { items, categories, colors, prices } from '../data.js';
+import { useMemo, useState } from "react";
+import { CATEGORIES, OCCASIONS } from "../data.js";
+import useFirebaseList from "../hooks/useFirebaseList.js";
+import ItemCard from "../components/ItemCard.jsx";
+import Spinner from "./Spinner.jsx";
+import Alert from "./Alert.jsx";
+import { db } from "../firebase.js";
+import { ref, update } from "firebase/database";
 
 export default function Closet() {
-  const [q, setQ] = useState('');
-  const [category, setCategory] = useState('All');
-  const [color, setColor] = useState('All');
-  const [price, setPrice] = useState('All');
+  const { data: items, loading, error } = useFirebaseList("items");
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [occasion, setOccasion] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
-  const filtered = useMemo(() => {
-    return items.filter(it => {
-      const hitQ = q.trim() === '' || it.name.toLowerCase().includes(q.toLowerCase());
-      const hitCat = category === 'All' || it.category === category;
-      const hitColor = color === 'All' || it.color === color;
-      const hitPrice =
-        price === 'All' ||
-        (price === '< $80' && it.price < 80) ||
-        (price === '$80–$120' && it.price >= 80 && it.price <= 120) ||
-        (price === '> $120' && it.price > 120);
-      return hitQ && hitCat && hitColor && hitPrice;
+  const filteredItems = useMemo(() => {
+    const lowerQuery = query.trim().toLowerCase();
+
+    return items.filter((item) => {
+      const matchesQuery =
+        !lowerQuery ||
+        (item.name && item.name.toLowerCase().includes(lowerQuery)) ||
+        (item.color && item.color.toLowerCase().includes(lowerQuery));
+
+      const matchesCategory = !category || item.category === category;
+      const matchesOccasion = !occasion || item.occasion === occasion;
+      const matchesFavorite = !favoritesOnly || item.isFavorite;
+
+      return (
+        matchesQuery &&
+        matchesCategory &&
+        matchesOccasion &&
+        matchesFavorite
+      );
     });
-  }, [q, category, color, price]);
+  }, [items, query, category, occasion, favoritesOnly]);
+
+  const itemCards = filteredItems.map((item) => {
+    const handleToggleFavorite = async () => {
+      if (!item.id) return;
+
+      try {
+        const itemRef = ref(db, `items/${item.id}`);
+        await update(itemRef, { isFavorite: !item.isFavorite });
+      } catch (err) {
+        // We rely on Firebase error handling elsewhere. No alert() allowed.
+        console.error("Error updating favorite:", err);
+      }
+    };
+
+    return (
+      <ItemCard
+        key={item.id}
+        item={item}
+        onToggleFavorite={handleToggleFavorite}
+      />
+    );
+  });
 
   return (
-    <>
-      <section className="card hero">
-        <img className="hero-img" src="/img/closet-hero.jpg" alt="Soft neutral wardrobe backdrop" />
-        <div className="hero-copy">
-          <h1 className="h2">Closet</h1>
-          <p className="muted">Filter and browse your capsule pieces.</p>
-        </div>
-      </section>
+    <section aria-labelledby="closet-heading">
+      <div className="page-header">
+        <h2 id="closet-heading" className="page-title">
+          Closet
+        </h2>
+        <p className="page-description">
+          Browse your capsule wardrobe, filter by category or occasion, and
+          favorite pieces you love most.
+        </p>
+      </div>
 
-      <section className="card">
-        <h2 className="h3">Filter</h2>
-        <div className="form-grid">
-          <div className="form-control">
-            <label htmlFor="search">Search</label>
+      <form className="filter-form" aria-label="Filter closet items">
+        <div className="filter-row">
+          <div className="filter-field">
+            <label htmlFor="query">Search</label>
             <input
-              id="search"
+              id="query"
               type="search"
-              placeholder="Poplin, denim, loafers"
-              value={q}
-              onChange={e => setQ(e.target.value)}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search by name or color"
             />
           </div>
 
-          <div className="form-control">
-            <label htmlFor="cat">Category</label>
-            <select id="cat" value={category} onChange={e => setCategory(e.target.value)}>
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          <div className="filter-field">
+            <label htmlFor="category">Category</label>
+            <select
+              id="category"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              <option value="">All</option>
+              {CATEGORIES.map((cat) => (
+                <option value={cat} key={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
           </div>
 
-          <div className="form-control">
-            <label htmlFor="color">Color</label>
-            <select id="color" value={color} onChange={e => setColor(e.target.value)}>
-              {colors.map(c => <option key={c} value={c}>{c}</option>)}
+          <div className="filter-field">
+            <label htmlFor="occasion">Occasion</label>
+            <select
+              id="occasion"
+              value={occasion}
+              onChange={(event) => setOccasion(event.target.value)}
+            >
+              <option value="">All</option>
+              {OCCASIONS.map((occ) => (
+                <option value={occ} key={occ}>
+                  {occ}
+                </option>
+              ))}
             </select>
           </div>
 
-          <div className="form-control">
-            <label htmlFor="price">Price</label>
-            <select id="price" value={price} onChange={e => setPrice(e.target.value)}>
-              {prices.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+          <div className="filter-checkbox">
+            <input
+              id="favorites-only"
+              type="checkbox"
+              checked={favoritesOnly}
+              onChange={(event) => setFavoritesOnly(event.target.checked)}
+            />
+            <label htmlFor="favorites-only">Favorites only</label>
           </div>
         </div>
-      </section>
+      </form>
 
-      <section className="grid">
-        {filtered.map(it => (
-          <ItemCard key={it.id} {...it} />
-        ))}
-      </section>
-    </>
+      {loading && <Spinner label="Loading items from your closet..." />}
+      {error && (
+        <Alert
+          type="error"
+          message="There was a problem loading closet items. Please refresh and try again."
+        />
+      )}
+
+      {!loading && !error && filteredItems.length === 0 && (
+        <p className="empty-state">
+          No items match your filters yet. Try clearing filters or add new
+          pieces to your closet.
+        </p>
+      )}
+
+      {!loading && !error && filteredItems.length > 0 && (
+        <div className="grid grid--items" aria-live="polite">
+          {itemCards}
+        </div>
+      )}
+    </section>
   );
 }
