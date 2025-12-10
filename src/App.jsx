@@ -52,7 +52,7 @@ function ShellLayout() {
 
       <footer className="site-footer">
         <div className="container footer-bar">
-          <p>© 2025 The Capsule Closet Planner</p>
+          <p>© 2025 The Capsule</p>
         </div>
       </footer>
     </div>

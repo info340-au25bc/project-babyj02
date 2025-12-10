@@ -3,7 +3,7 @@ import React from "react";
 export default function About() {
   return (
     <div className="page-head">
-      <h1>About The Capsule Closet</h1>
+      <h1>About The Capsule</h1>
       <p className="screen-note">
         A focused wardrobe planner for people who want a calm, intentional
         closet instead of endless “nothing to wear” days.
@@ -12,7 +12,7 @@ export default function About() {
       <section className="card narrow" style={{ marginTop: "24px" }}>
         <h2 className="h3">What this app is for</h2>
         <p>
-          The Capsule Closet is designed to help you curate a small, considered
+          The Capsule is designed to help you curate a small, considered
           collection of outfits that actually fit your real life. Instead of
           scrolling through inspiration forever, you work with pieces you
           already own and new items you plan intentionally.
@@ -45,7 +45,7 @@ export default function About() {
           How people might use it
         </h2>
         <p>
-          The Capsule Closet can support seasonal closet edits, travel packing,
+          The Capsule can support seasonal closet edits, travel packing,
           budget planning or simply getting dressed for class and work without
           overthinking. It is meant to be a quiet space where a small number of
           pieces are styled thoughtfully and reused often.
