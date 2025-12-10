@@ -1,47 +1,81 @@
-import { Link } from "react-router-dom";
+import React from "react";
+
+const categoryImageMap = {
+  top: "/img/item-top.jpg",
+  tops: "/img/item-top.jpg",
+  shirt: "/img/item-top.jpg",
+
+  bottom: "/img/item-bottom.jpg",
+  bottoms: "/img/item-bottom.jpg",
+  pants: "/img/item-bottom.jpg",
+  trousers: "/img/item-bottom.jpg",
+  jeans: "/img/item-bottom.jpg",
+
+  outerwear: "/img/item-outer.jpg",
+  coat: "/img/item-outer.jpg",
+  jacket: "/img/item-outer.jpg",
+  blazer: "/img/item-outer.jpg",
+  cardigan: "/img/item-outer.jpg",
+
+  shoes: "/img/item-shoes.jpg",
+  footwear: "/img/item-shoes.jpg",
+};
 
 export default function ItemCard({ item, onToggleFavorite }) {
-  const { id, name, category, color, price, imageUrl, isFavorite, occasion } = item;
+  const {
+    name,
+    category,
+    color,
+    occasion,
+    price,
+    notes,
+    isFavorite,
+    imageUrl,
+  } = item;
 
-  const badge = occasion ? (
-    <span className="item-badge" aria-label={`Occasion: ${occasion}`}>
-      {occasion}
-    </span>
-  ) : null;
+  const normalizedCategory = (category || "").toLowerCase();
+  const fallbackImage =
+    categoryImageMap[normalizedCategory] || "/img/outfit-hero.jpg";
 
-  const favoriteLabel = isFavorite ? "Remove from favorites" : "Mark as favorite";
+  const displayImage =
+    (imageUrl && imageUrl.trim().length > 0 ? imageUrl.trim() : null) ||
+    fallbackImage;
 
   return (
-    <article className="item-card">
-      <div className="item-image-wrapper">
-        <img
-          src={imageUrl || "/img/item-top.jpg"}
-          alt={name || "Closet item"}
-          className="item-image"
-        />
-        {badge}
-        <button
-          type="button"
-          className={`favorite-button ${isFavorite ? "favorite-button--active" : ""}`}
-          onClick={onToggleFavorite}
-          aria-label={favoriteLabel}
-        >
-          {isFavorite ? "♥" : "♡"}
-        </button>
-      </div>
+    <article className="card item" role="listitem">
+      <figure>
+        <img src={displayImage} alt={name || "Closet item"} />
+      </figure>
 
       <div className="item-body">
-        <h3 className="item-title">{name}</h3>
-        <p className="item-meta">
-          <span>{category}</span>
-          {color && <span aria-label={`Color: ${color}`}>{color}</span>}
-        </p>
-        <p className="item-price">${Number(price || 0).toFixed(2)}</p>
-        <div className="item-actions">
-          <Link to="/builder" className="secondary-button">
-            Use in outfit
-          </Link>
+        <div className="item-meta">
+          <div>
+            <h3 className="h4">{name}</h3>
+            <p className="muted">
+              {category || "Item"}
+              {color ? ` · ${color}` : ""}
+              {occasion ? ` · ${occasion}` : ""}
+            </p>
+          </div>
+
+          {typeof price === "number" && !Number.isNaN(price) && (
+            <span className="price">${price.toFixed(0)}</span>
+          )}
         </div>
+
+        {notes && <p>{notes}</p>}
+
+        {onToggleFavorite && (
+          <div className="item-actions">
+            <button
+              type="button"
+              className="chip pill"
+              onClick={() => onToggleFavorite(item)}
+            >
+              {isFavorite ? "★ Favorited" : "☆ Add to favorites"}
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );

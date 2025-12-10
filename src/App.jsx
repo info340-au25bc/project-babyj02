@@ -1,67 +1,59 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  NavLink,
+  Outlet,
+} from "react-router-dom";
+
 import Closet from "./pages/Closet.jsx";
 import Add from "./pages/Add.jsx";
 import Builder from "./pages/Builder.jsx";
 import Outfit from "./pages/Outfit.jsx";
 import OutfitDetail from "./pages/OutfitDetail.jsx";
 import Planner from "./pages/Planner.jsx";
-import PriceChart from "./pages/PriceChart.jsx";
 import About from "./pages/About.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
-function AppLayout({ children }) {
+function ShellLayout() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <div className="app-header-left">
-          <img
-            src="/img/closet-hero.jpg"
-            alt="Neatly organized neutral capsule closet"
-            className="app-logo"
-          />
-          <div>
-            <h1 className="app-title">The Capsule Closet</h1>
-            <p className="app-subtitle">Curate, build outfits, and plan your week.</p>
-          </div>
+    <div className="app-shell">
+      <header className="site-header">
+        <div className="container header-bar">
+          <span className="brand">The Capsule</span>
+          <nav aria-label="Primary">
+            <ul className="nav">
+              <li>
+                <NavLink to="/" end>
+                  Closet
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/add">Add item</NavLink>
+              </li>
+              <li>
+                <NavLink to="/builder">Outfit builder</NavLink>
+              </li>
+              <li>
+                <NavLink to="/planner">Weekly planner</NavLink>
+              </li>
+              <li>
+                <NavLink to="/about">About</NavLink>
+              </li>
+            </ul>
+          </nav>
         </div>
-
-        <nav aria-label="Main navigation" className="app-nav">
-          <NavLink to="/" end className="nav-link">
-            Closet
-          </NavLink>
-          <NavLink to="/add" className="nav-link">
-            Add Item
-          </NavLink>
-          <NavLink to="/builder" className="nav-link">
-            Outfit Builder
-          </NavLink>
-          <NavLink to="/outfits" className="nav-link">
-            Saved Outfits
-          </NavLink>
-          <NavLink to="/planner" className="nav-link">
-            Planner
-          </NavLink>
-          <NavLink to="/price-chart" className="nav-link">
-            Price Chart
-          </NavLink>
-          <NavLink to="/about" className="nav-link">
-            About
-          </NavLink>
-        </nav>
       </header>
 
-      <main className="app-main" id="main-content">
-        {children}
+      <main className="container">
+        <Outlet />
       </main>
 
-      <footer className="app-footer">
-        <p>© {new Date().getFullYear()} Jackie Tran · Capsule Closet</p>
-        <p>
-          Contact:{" "}
-          <a href="mailto:jackie28@uw.edu" className="footer-link">
-            jackie28@uw.edu
-          </a>
-        </p>
+      <footer className="site-footer">
+        <div className="container footer-bar">
+          <p>© 2025 The Capsule Closet Planner</p>
+        </div>
       </footer>
     </div>
   );
@@ -69,20 +61,21 @@ function AppLayout({ children }) {
 
 export default function App() {
   return (
-    <Router>
-      <AppLayout>
-        <Routes>
-          <Route path="/" element={<Closet />} />
-          <Route path="/add" element={<Add />} />
-          <Route path="/builder" element={<Builder />} />
-          <Route path="/outfits" element={<Outfit />} />
-          <Route path="/outfits/:outfitId" element={<OutfitDetail />} />
-          <Route path="/planner" element={<Planner />} />
-          <Route path="/price-chart" element={<PriceChart />} />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AppLayout>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ShellLayout />}>
+          <Route index element={<Closet />} />
+          <Route path="add" element={<Add />} />
+          <Route path="builder" element={<Builder />} />
+          <Route path="outfits" element={<Outfit />} />
+          <Route path="outfits/:id" element={<OutfitDetail />} />
+          <Route path="planner" element={<Planner />} />
+          <Route path="about" element={<About />} />
+        </Route>
+
+        {/* Fallback for anything unknown */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

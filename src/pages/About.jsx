@@ -1,42 +1,56 @@
+import React from "react";
+
 export default function About() {
   return (
-    <section aria-labelledby="about-heading">
-      <div className="page-header">
-        <h2 id="about-heading" className="page-title">
-          About The Capsule Closet
-        </h2>
-        <p className="page-description">
-          A responsive, data-driven wardrobe planner built for the INFO 340
-          final project.
-        </p>
-      </div>
+    <div className="page-head">
+      <h1>About The Capsule Closet</h1>
+      <p className="screen-note">
+        A focused wardrobe planner for people who want a calm, intentional
+        closet instead of endless “nothing to wear” days.
+      </p>
 
-      <article className="card">
-        <h3>What this app does</h3>
+      <section className="card narrow" style={{ marginTop: "24px" }}>
+        <h2 className="h3">What this app is for</h2>
         <p>
-          The Capsule Closet helps you curate a small, intentional wardrobe and
-          actually use it. You can:
+          The Capsule Closet is designed to help you curate a small, considered
+          collection of outfits that actually fit your real life. Instead of
+          scrolling through inspiration forever, you work with pieces you
+          already own and new items you plan intentionally.
         </p>
         <ul>
-          <li>Add real clothing items with categories, colors, and prices.</li>
-          <li>Filter and favorite items in your closet view.</li>
+          <li>Add clothing items with names, categories, colors, prices, and photos.</li>
+          <li>Filter and favorite items in your closet to see what you truly wear.</li>
           <li>Build complete outfits and save them with estimated totals.</li>
-          <li>Assign outfits to days in a weekly planner.</li>
-          <li>Visualize your spending by category in a price chart.</li>
+          <li>Assign outfits to days in a weekly planner so your week is styled in advance.</li>
+          <li>Review spending by category in a simple, readable price chart.</li>
         </ul>
 
-        <h3>Implementation details</h3>
+        <h2 className="h3" style={{ marginTop: "24px" }}>
+          Design and experience
+        </h2>
         <p>
-          This app is a single-page React application created with Vite. It
-          uses:
+          The interface follows a neutral, editorial wardrobe aesthetic: soft
+          ivory backgrounds, warm light and minimal chrome so the focus stays on
+          your clothes. The goal is to feel like a modern brand’s internal tool
+          rather than a generic template.
         </p>
         <ul>
-          <li>React components and hooks for stateful interactivity.</li>
-          <li>react-router for client-side routing across multiple views.</li>
-          <li>Firebase Realtime Database for persistent storage.</li>
-          <li>Recharts for data visualization.</li>
+          <li>Hero imagery that reflects a curated capsule wardrobe.</li>
+          <li>Consistent spacing and serif typography across all pages.</li>
+          <li>Clear navigation between Closet, Add item, Outfit builder, Planner and About.</li>
+          <li>Accessible color contrast and keyboard-focusable controls where possible.</li>
         </ul>
-      </article>
-    </section>
+
+        <h2 className="h3" style={{ marginTop: "24px" }}>
+          How people might use it
+        </h2>
+        <p>
+          The Capsule Closet can support seasonal closet edits, travel packing,
+          budget planning or simply getting dressed for class and work without
+          overthinking. It is meant to be a quiet space where a small number of
+          pieces are styled thoughtfully and reused often.
+        </p>
+      </section>
+    </div>
   );
 }

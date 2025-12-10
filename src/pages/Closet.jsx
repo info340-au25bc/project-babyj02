@@ -1,152 +1,223 @@
-import { useMemo, useState } from "react";
-import { CATEGORIES, OCCASIONS } from "../data.js";
-import useFirebaseList from "../hooks/useFirebaseList.js";
-import ItemCard from "../components/ItemCard.jsx";
-import Spinner from "./Spinner.jsx";
-import Alert from "./Alert.jsx";
-import { db } from "../firebase.js";
-import { ref, update } from "firebase/database";
+import React, { useMemo, useState } from "react";
+
+/**
+ * Static capsule pieces so the page looks fully designed
+ * and uses all of your curated images.
+ *
+ * Images live in public/img so we can reference them with /img/...
+ */
+const INITIAL_ITEMS = [
+  {
+    id: "top",
+    name: "Soft ivory shirt",
+    category: "Top",
+    occasion: "Everyday",
+    price: "$145",
+    notes: "Relaxed fit, looks good half-tucked into denim.",
+    imageUrl: "/img/item-top.jpg",
+    favorite: true,
+  },
+  {
+    id: "bottom",
+    name: "Tailored denim",
+    category: "Bottom",
+    occasion: "Casual",
+    price: "$165",
+    notes: "Straight-leg, ankle length. Pairs with everything.",
+    imageUrl: "/img/item-bottom.jpg",
+    favorite: true,
+  },
+  {
+    id: "outer",
+    name: "Black cardigan jacket",
+    category: "Outerwear",
+    occasion: "Work",
+    price: "$210",
+    notes: "Structured knit that dresses up basics.",
+    imageUrl: "/img/item-outer.jpg",
+    favorite: false,
+  },
+  {
+    id: "shoes",
+    name: "Loafers & mini bag",
+    category: "Shoes & accessories",
+    occasion: "Dinner",
+    price: "$320",
+    notes: "Low-effort way to make jeans feel finished.",
+    imageUrl: "/img/item-shoes.jpg",
+    favorite: false,
+  },
+];
 
 export default function Closet() {
-  const { data: items, loading, error } = useFirebaseList("items");
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [occasion, setOccasion] = useState("");
+  const [items, setItems] = useState(INITIAL_ITEMS);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [occasion, setOccasion] = useState("All");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   const filteredItems = useMemo(() => {
-    const lowerQuery = query.trim().toLowerCase();
-
     return items.filter((item) => {
-      const matchesQuery =
-        !lowerQuery ||
-        (item.name && item.name.toLowerCase().includes(lowerQuery)) ||
-        (item.color && item.color.toLowerCase().includes(lowerQuery));
+      const matchesSearch =
+        !search ||
+        item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.notes.toLowerCase().includes(search.toLowerCase());
 
-      const matchesCategory = !category || item.category === category;
-      const matchesOccasion = !occasion || item.occasion === occasion;
-      const matchesFavorite = !favoritesOnly || item.isFavorite;
+      const matchesCategory =
+        category === "All" || item.category === category;
+
+      const matchesOccasion =
+        occasion === "All" || item.occasion === occasion;
+
+      const matchesFavorite = !favoritesOnly || item.favorite;
 
       return (
-        matchesQuery &&
-        matchesCategory &&
-        matchesOccasion &&
-        matchesFavorite
+        matchesSearch && matchesCategory && matchesOccasion && matchesFavorite
       );
     });
-  }, [items, query, category, occasion, favoritesOnly]);
+  }, [items, search, category, occasion, favoritesOnly]);
 
-  const itemCards = filteredItems.map((item) => {
-    const handleToggleFavorite = async () => {
-      if (!item.id) return;
-
-      try {
-        const itemRef = ref(db, `items/${item.id}`);
-        await update(itemRef, { isFavorite: !item.isFavorite });
-      } catch (err) {
-        // We rely on Firebase error handling elsewhere. No alert() allowed.
-        console.error("Error updating favorite:", err);
-      }
-    };
-
-    return (
-      <ItemCard
-        key={item.id}
-        item={item}
-        onToggleFavorite={handleToggleFavorite}
-      />
+  function toggleFavorite(id) {
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, favorite: !item.favorite } : item
+      )
     );
-  });
+  }
 
   return (
-    <section aria-labelledby="closet-heading">
-      <div className="page-header">
-        <h2 id="closet-heading" className="page-title">
-          Closet
-        </h2>
-        <p className="page-description">
-          Browse your capsule wardrobe, filter by category or occasion, and
-          favorite pieces you love most.
-        </p>
-      </div>
+    <>
+      {/* Hero section with the rack image */}
+      <section className="capsule-hero">
+        <figure className="capsule-hero-media">
+          <img src="/img/closet-hero.jpg" alt="Neutral capsule wardrobe on a clothing rack" />
+          <figcaption className="capsule-hero-overlay">
+            <p className="capsule-hero-eyebrow">Wardrobe planning studio</p>
+            <h1 className="capsule-hero-title">
+              Build a capsule that actually fits your real life
+            </h1>
+            <p className="capsule-hero-subtitle">
+              Calm neutral pieces, intentional outfits, and a closet that feels
+              like your own editorial rack instead of chaos.
+            </p>
+          </figcaption>
+        </figure>
+      </section>
 
-      <form className="filter-form" aria-label="Filter closet items">
-        <div className="filter-row">
-          <div className="filter-field">
-            <label htmlFor="query">Search</label>
+      {/* Main closet content */}
+      <section className="capsule-section">
+        <header className="capsule-section-header">
+          <h2 className="capsule-section-title">Closet</h2>
+          <p className="capsule-section-copy">
+            Browse your capsule wardrobe, filter by category or occasion, and
+            star the pieces you reach for the most.
+          </p>
+        </header>
+
+        {/* Filters */}
+        <div className="capsule-filters card">
+          <div className="capsule-filter-field">
+            <label htmlFor="search">Search</label>
             <input
-              id="query"
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by name or color"
+              id="search"
+              type="text"
+              placeholder="e.g. cream knit, black trousers"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          <div className="filter-field">
-            <label htmlFor="category">Category</label>
-            <select
-              id="category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              <option value="">All</option>
-              {CATEGORIES.map((cat) => (
-                <option value={cat} key={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+          <div className="capsule-filter-row">
+            <div className="capsule-filter-field">
+              <label htmlFor="category">Category</label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option>All</option>
+                <option>Top</option>
+                <option>Bottom</option>
+                <option>Outerwear</option>
+                <option>Shoes & accessories</option>
+              </select>
+            </div>
+
+            <div className="capsule-filter-field">
+              <label htmlFor="occasion">Occasion</label>
+              <select
+                id="occasion"
+                value={occasion}
+                onChange={(e) => setOccasion(e.target.value)}
+              >
+                <option>All</option>
+                <option>Everyday</option>
+                <option>Casual</option>
+                <option>Work</option>
+                <option>Dinner</option>
+              </select>
+            </div>
           </div>
 
-          <div className="filter-field">
-            <label htmlFor="occasion">Occasion</label>
-            <select
-              id="occasion"
-              value={occasion}
-              onChange={(event) => setOccasion(event.target.value)}
-            >
-              <option value="">All</option>
-              {OCCASIONS.map((occ) => (
-                <option value={occ} key={occ}>
-                  {occ}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-checkbox">
+          <label className="capsule-checkbox">
             <input
-              id="favorites-only"
               type="checkbox"
               checked={favoritesOnly}
-              onChange={(event) => setFavoritesOnly(event.target.checked)}
+              onChange={(e) => setFavoritesOnly(e.target.checked)}
             />
-            <label htmlFor="favorites-only">Favorites only</label>
-          </div>
+            <span>Favorites only</span>
+          </label>
         </div>
-      </form>
 
-      {loading && <Spinner label="Loading items from your closet..." />}
-      {error && (
-        <Alert
-          type="error"
-          message="There was a problem loading closet items. Please refresh and try again."
-        />
-      )}
+        {/* Grid of capsule pieces */}
+        <section className="capsule-items">
+          <header className="capsule-items-header">
+            <h3>Core pieces in your capsule</h3>
+            <p>
+              A tight edit of pieces that can be remixed across outfits: shirt,
+              denim, outer layer, and finishing accessories.
+            </p>
+          </header>
 
-      {!loading && !error && filteredItems.length === 0 && (
-        <p className="empty-state">
-          No items match your filters yet. Try clearing filters or add new
-          pieces to your closet.
-        </p>
-      )}
+          {filteredItems.length === 0 ? (
+            <p className="capsule-empty">
+              No pieces match this filter yet. Try clearing a filter or search
+              term.
+            </p>
+          ) : (
+            <div className="capsule-items-grid">
+              {filteredItems.map((item) => (
+                <article key={item.id} className="capsule-item-card">
+                  <div className="capsule-item-media">
+                    <img src={item.imageUrl} alt={item.name} />
+                    <button
+                      type="button"
+                      className={
+                        item.favorite
+                          ? "capsule-fav-button capsule-fav-button--active"
+                          : "capsule-fav-button"
+                      }
+                      onClick={() => toggleFavorite(item.id)}
+                      aria-pressed={item.favorite}
+                    >
+                      {item.favorite ? "★" : "☆"}
+                    </button>
+                  </div>
 
-      {!loading && !error && filteredItems.length > 0 && (
-        <div className="grid grid--items" aria-live="polite">
-          {itemCards}
-        </div>
-      )}
-    </section>
+                  <div className="capsule-item-body">
+                    <h4>{item.name}</h4>
+                    <p className="capsule-item-meta">
+                      {item.category} · {item.occasion}
+                    </p>
+                    <p className="capsule-item-notes">{item.notes}</p>
+                    <p className="capsule-item-price">{item.price}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </section>
+    </>
   );
 }
