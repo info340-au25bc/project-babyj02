@@ -1,254 +1,156 @@
-import { useState, useMemo } from "react";
-import useFirebaseList from "../hooks/useFirebaseList.js";
-import Spinner from "./Spinner.jsx";
-import Alert from "./Alert.jsx";
-import { db } from "../firebase.js";
-import { ref, push, set } from "firebase/database";
+import React, { useMemo, useState } from "react";
+
+// Curated capsule items for the builder
+const CAPSULE_ITEMS = [
+  {
+    id: "top",
+    name: "Soft ivory shirt",
+    category: "Top",
+    price: 145,
+    imageUrl: "/img/item-top.jpg",
+  },
+  {
+    id: "bottom",
+    name: "Tailored denim",
+    category: "Bottom",
+    price: 165,
+    imageUrl: "/img/item-bottom.jpg",
+  },
+  {
+    id: "outer",
+    name: "Black cardigan jacket",
+    category: "Outerwear",
+    price: 210,
+    imageUrl: "/img/item-outer.jpg",
+  },
+  {
+    id: "shoes",
+    name: "Loafers & mini bag",
+    category: "Shoes & accessories",
+    price: 320,
+    imageUrl: "/img/item-shoes.jpg",
+  },
+];
+
+function itemsForCategory(category) {
+  return CAPSULE_ITEMS.filter((item) => item.category === category);
+}
 
 export default function Builder() {
-  const { data: items, loading, error } = useFirebaseList("items");
-
-  const [name, setName] = useState("");
-  const [topId, setTopId] = useState("");
-  const [bottomId, setBottomId] = useState("");
-  const [outerId, setOuterId] = useState("");
-  const [shoesId, setShoesId] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-
-  const tops = useMemo(
-    () => items.filter((item) => item.category === "Top"),
-    [items]
-  );
-  const bottoms = useMemo(
-    () => items.filter((item) => item.category === "Bottom"),
-    [items]
-  );
-  const outers = useMemo(
-    () => items.filter((item) => item.category === "Outerwear"),
-    [items]
-  );
-  const shoes = useMemo(
-    () => items.filter((item) => item.category === "Shoes"),
-    [items]
-  );
+  const [selectedIds, setSelectedIds] = useState({
+    Top: "top",
+    Bottom: "bottom",
+    Outerwear: "outer",
+    "Shoes & accessories": "shoes",
+  });
 
   const selectedItems = useMemo(() => {
-    const ids = [topId, bottomId, outerId, shoesId].filter(Boolean);
-    return items.filter((item) => ids.includes(item.id));
-  }, [items, topId, bottomId, outerId, shoesId]);
+    return Object.values(selectedIds)
+      .map((id) => CAPSULE_ITEMS.find((item) => item.id === id))
+      .filter(Boolean);
+  }, [selectedIds]);
 
-  const estimatedPrice = selectedItems.reduce(
-    (total, item) => total + Number(item.price || 0),
-    0
-  );
+  const totalPrice = selectedItems.reduce((sum, item) => sum + item.price, 0);
 
-  const handleSave = async (event) => {
-    event.preventDefault();
-    setSaveError(null);
-    setSuccessMessage("");
-
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setSaveError("Please provide an outfit name.");
-      return;
-    }
-
-    if (!topId && !bottomId && !outerId && !shoesId) {
-      setSaveError("Select at least one item for your outfit.");
-      return;
-    }
-
-    try {
-      setSaving(true);
-      const outfitsRef = ref(db, "outfits");
-      const newOutfitRef = push(outfitsRef);
-
-      const outfitData = {
-        name: trimmedName,
-        slots: {
-          topId: topId || null,
-          bottomId: bottomId || null,
-          outerId: outerId || null,
-          shoesId: shoesId || null
-        },
-        estimatedPrice,
-        createdAt: Date.now()
-      };
-
-      await set(newOutfitRef, outfitData);
-
-      setName("");
-      setTopId("");
-      setBottomId("");
-      setOuterId("");
-      setShoesId("");
-      setSuccessMessage("Outfit saved.");
-    } catch (err) {
-      console.error(err);
-      setSaveError("There was a problem saving your outfit. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const topOptions = tops.map((item) => (
-    <option value={item.id} key={item.id}>
-      {item.name || "Untitled top"}
-    </option>
-  ));
-  const bottomOptions = bottoms.map((item) => (
-    <option value={item.id} key={item.id}>
-      {item.name || "Untitled bottom"}
-    </option>
-  ));
-  const outerOptions = outers.map((item) => (
-    <option value={item.id} key={item.id}>
-      {item.name || "Untitled outerwear"}
-    </option>
-  ));
-  const shoeOptions = shoes.map((item) => (
-    <option value={item.id} key={item.id}>
-      {item.name || "Untitled shoes"}
-    </option>
-  ));
-
-  const selectedList = selectedItems.map((item) => (
-    <li key={item.id} className="summary-list-item">
-      <span>{item.name}</span>
-      <span>${Number(item.price || 0).toFixed(2)}</span>
-    </li>
-  ));
+  function handleChange(role, id) {
+    setSelectedIds((current) => ({
+      ...current,
+      [role]: id,
+    }));
+  }
 
   return (
-    <section aria-labelledby="builder-heading">
-      <div className="page-header">
-        <h2 id="builder-heading" className="page-title">
-          Outfit Builder
-        </h2>
-        <p className="page-description">
-          Mix and match items from your closet to design a full outfit and
-          estimate its total cost.
+    <section className="capsule-section">
+      <header className="capsule-section-header">
+        <h2 className="capsule-section-title">Outfit builder</h2>
+        <p className="capsule-section-copy">
+          Mix and match your core pieces to design a full look and see the
+          estimated total at a glance.
         </p>
+      </header>
+
+      <div className="capsule-builder-layout">
+        {/* Left side: selectors */}
+        <section className="card capsule-builder-card">
+          <h3 className="capsule-builder-heading">Select your pieces</h3>
+
+          <div className="capsule-builder-fields">
+            <BuilderSelect
+              label="Top"
+              items={itemsForCategory("Top")}
+              value={selectedIds["Top"]}
+              onChange={(id) => handleChange("Top", id)}
+            />
+            <BuilderSelect
+              label="Bottom"
+              items={itemsForCategory("Bottom")}
+              value={selectedIds["Bottom"]}
+              onChange={(id) => handleChange("Bottom", id)}
+            />
+            <BuilderSelect
+              label="Outerwear"
+              items={itemsForCategory("Outerwear")}
+              value={selectedIds["Outerwear"]}
+              onChange={(id) => handleChange("Outerwear", id)}
+            />
+            <BuilderSelect
+              label="Shoes & accessories"
+              items={itemsForCategory("Shoes & accessories")}
+              value={selectedIds["Shoes & accessories"]}
+              onChange={(id) => handleChange("Shoes & accessories", id)}
+            />
+          </div>
+
+          <div className="capsule-builder-total">
+            <span className="capsule-builder-total-label">Estimated total</span>
+            <span className="capsule-builder-total-value">
+              ${totalPrice.toLocaleString()}
+            </span>
+          </div>
+        </section>
+
+        {/* Right side: visual summary */}
+        <section className="card capsule-builder-summary">
+          <div className="capsule-builder-image">
+            <img
+              src="/img/outfit-hero.jpg"
+              alt="Neutral outfit with bag, belt, and sunglasses"
+            />
+          </div>
+
+          <div className="capsule-builder-summary-body">
+            <h3 className="capsule-builder-heading">Outfit summary</h3>
+            <ul className="capsule-builder-list">
+              {selectedItems.map((item) => (
+                <li key={item.id}>
+                  <span>{item.name}</span>
+                  <span>${item.price}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="capsule-builder-note">
+              This builder shows one possible combination of your capsule.
+              Swap pieces above to explore different looks while keeping the
+              same calm, neutral palette.
+            </p>
+          </div>
+        </section>
       </div>
-
-      {error && (
-        <Alert
-          type="error"
-          message="There was a problem loading items. Please refresh the page."
-        />
-      )}
-      {saveError && <Alert type="error" message={saveError} />}
-      {successMessage && <Alert type="info" message={successMessage} />}
-
-      {loading && <Spinner label="Loading closet items for builder..." />}
-
-      {!loading && !error && items.length === 0 && (
-        <p className="empty-state">
-          You do not have any items in your closet yet. Add some items first
-          before building an outfit.
-        </p>
-      )}
-
-      {!loading && !error && items.length > 0 && (
-        <div className="builder-layout">
-          <form className="card form-card" onSubmit={handleSave}>
-            <div className="form-field">
-              <label htmlFor="outfit-name">Outfit name</label>
-              <input
-                id="outfit-name"
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="e.g. Neutral campus day"
-                required
-              />
-            </div>
-
-            <div className="form-grid">
-              <div className="form-field">
-                <label htmlFor="top-select">Top</label>
-                <select
-                  id="top-select"
-                  value={topId}
-                  onChange={(event) => setTopId(event.target.value)}
-                >
-                  <option value="">None</option>
-                  {topOptions}
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="bottom-select">Bottom</label>
-                <select
-                  id="bottom-select"
-                  value={bottomId}
-                  onChange={(event) => setBottomId(event.target.value)}
-                >
-                  <option value="">None</option>
-                  {bottomOptions}
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="outer-select">Outerwear</label>
-                <select
-                  id="outer-select"
-                  value={outerId}
-                  onChange={(event) => setOuterId(event.target.value)}
-                >
-                  <option value="">None</option>
-                  {outerOptions}
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="shoes-select">Shoes</label>
-                <select
-                  id="shoes-select"
-                  value={shoesId}
-                  onChange={(event) => setShoesId(event.target.value)}
-                >
-                  <option value="">None</option>
-                  {shoeOptions}
-                </select>
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={saving}
-              >
-                {saving ? "Saving outfit..." : "Save Outfit"}
-              </button>
-            </div>
-
-            {saving && (
-              <Spinner label="Saving this outfit to Firebase database..." />
-            )}
-          </form>
-
-          <aside className="card summary-card" aria-label="Outfit summary">
-            <h3 className="summary-title">Outfit summary</h3>
-            {selectedItems.length === 0 ? (
-              <p className="empty-state">
-                Start selecting items on the left to preview this outfit.
-              </p>
-            ) : (
-              <>
-                <ul className="summary-list">{selectedList}</ul>
-                <p className="summary-total">
-                  Estimated total:{" "}
-                  <strong>${estimatedPrice.toFixed(2)}</strong>
-                </p>
-              </>
-            )}
-          </aside>
-        </div>
-      )}
     </section>
+  );
+}
+
+function BuilderSelect({ label, items, value, onChange }) {
+  return (
+    <div className="capsule-filter-field">
+      <label>{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
+        {items.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }

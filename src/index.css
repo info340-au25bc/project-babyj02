@@ -792,3 +792,182 @@ body {
     padding: 14px 14px 12px;
   }
 }
+
+/* ========= Outfit builder layout ========= */
+
+.capsule-builder-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.capsule-builder-card {
+  padding: 18px 20px 16px;
+  border-radius: 18px;
+  background: #fdfaf6;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
+}
+
+.capsule-builder-heading {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.capsule-builder-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.capsule-builder-total {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.capsule-builder-total-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7e70;
+}
+
+.capsule-builder-total-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #231f1b;
+}
+
+.capsule-builder-summary {
+  padding: 0;
+  overflow: hidden;
+}
+
+.capsule-builder-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.capsule-builder-summary-body {
+  padding: 14px 18px 16px;
+}
+
+.capsule-builder-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  font-size: 13px;
+}
+
+.capsule-builder-list li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.capsule-builder-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #746a60;
+}
+
+/* ========= Weekly planner ========= */
+
+.capsule-planner-card {
+  padding: 18px 20px 16px;
+  border-radius: 18px;
+  background: #fdfaf6;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
+}
+
+.capsule-planner-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.capsule-planner-day h3 {
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.capsule-planner-day select {
+  width: 100%;
+  margin-bottom: 6px;
+  border-radius: 999px;
+  border: 1px solid #ded4c5;
+  padding: 6px 12px;
+  font-size: 13px;
+  background-color: #fff;
+}
+
+.capsule-planner-description {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6c6256;
+}
+
+.capsule-planner-footer {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 12px;
+  color: #7b7166;
+}
+
+/* Mobile */
+
+@media (max-width: 900px) {
+  .capsule-builder-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .capsule-builder-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .capsule-planner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .capsule-planner-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Add page subtle polish */
+.add-form-card {
+  max-width: 720px;
+  margin: 32px auto 64px;
+  padding: 32px 40px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.03);
+}
+
+.add-form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 18px 32px;
+}
+
+.add-form-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-form-actions button {
+  min-width: 140px;
+}

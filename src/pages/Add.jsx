@@ -5,6 +5,14 @@ import { CATEGORIES, OCCASIONS } from "../data.js";
 import Spinner from "./Spinner.jsx";
 import Alert from "./Alert.jsx";
 
+// Curated default images per category
+const CATEGORY_IMAGE_MAP = {
+  Top: "/img/item-top.jpg",
+  Bottom: "/img/item-bottom.jpg",
+  Outerwear: "/img/item-outer.jpg",
+  "Shoes & accessories": "/img/item-shoes.jpg",
+};
+
 export default function Add() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
@@ -36,19 +44,24 @@ export default function Add() {
 
       const priceNumber = Number(price) || 0;
 
+      const trimmedImageUrl = imageUrl.trim();
+      const defaultImage =
+        CATEGORY_IMAGE_MAP[category] || "/img/item-top.jpg";
+
       const itemData = {
         name: trimmedName,
         category,
         color: color.trim(),
         price: priceNumber,
         occasion,
-        imageUrl: imageUrl.trim() || "/img/item-top.jpg",
+        imageUrl: trimmedImageUrl || defaultImage,
         isFavorite: false,
-        createdAt: Date.now()
+        createdAt: Date.now(),
       };
 
       await set(newItemRef, itemData);
 
+      // reset form
       setName("");
       setColor("");
       setPrice("");
@@ -56,8 +69,10 @@ export default function Add() {
       setImageUrl("");
       setSuccessMessage("Item added to your closet.");
     } catch (err) {
-      setSubmitError("There was a problem saving your item. Please try again.");
       console.error(err);
+      setSubmitError(
+        "There was a problem saving your item. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -67,7 +82,7 @@ export default function Add() {
     <section aria-labelledby="add-heading">
       <div className="page-header">
         <h2 id="add-heading" className="page-title">
-          Add Closet Item
+          Add closet item
         </h2>
         <p className="page-description">
           Log a new piece into your capsule wardrobe with its category, color,
@@ -88,7 +103,7 @@ export default function Add() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
-              placeholder="e.g. White linen button-up"
+              placeholder="Soft ivory shirt"
             />
           </div>
 
@@ -114,7 +129,7 @@ export default function Add() {
               type="text"
               value={color}
               onChange={(event) => setColor(event.target.value)}
-              placeholder="e.g. Warm ivory"
+              placeholder="Warm ivory"
             />
           </div>
 
@@ -127,7 +142,7 @@ export default function Add() {
               step="0.01"
               value={price}
               onChange={(event) => setPrice(event.target.value)}
-              placeholder="e.g. 120"
+              placeholder="120"
             />
           </div>
 
@@ -148,13 +163,15 @@ export default function Add() {
           </div>
 
           <div className="form-field form-field--full">
-            <label htmlFor="imageUrl">Image URL (optional)</label>
+            <label htmlFor="imageUrl">
+              Image URL <span className="label-optional">(optional)</span>
+            </label>
             <input
               id="imageUrl"
               type="url"
               value={imageUrl}
               onChange={(event) => setImageUrl(event.target.value)}
-              placeholder="Paste a direct image link or leave blank for default"
+              placeholder="Paste a direct image link, or leave blank to use a default look"
             />
           </div>
         </div>
@@ -165,12 +182,12 @@ export default function Add() {
             className="primary-button"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saving..." : "Add Item"}
+            {isSubmitting ? "Saving…" : "Add item"}
           </button>
         </div>
 
         {isSubmitting && (
-          <Spinner label="Saving your item to Firebase database..." />
+          <Spinner label="Saving your item to the capsule…" />
         )}
       </form>
     </section>

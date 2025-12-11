@@ -1,121 +1,117 @@
-import { useState, useEffect } from "react";
-import useFirebaseList from "../hooks/useFirebaseList.js";
-import { DAYS_OF_WEEK } from "../data.js";
-import Spinner from "./Spinner.jsx";
-import Alert from "./Alert.jsx";
-import { db } from "../firebase.js";
-import { ref, onValue, set } from "firebase/database";
+import React, { useState } from "react";
+
+const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const OUTFIT_OPTIONS = [
+  {
+    id: "none",
+    name: "No outfit planned",
+    description: "Leave this day open or decide in the morning.",
+  },
+  {
+    id: "office",
+    name: "Office capsule",
+    description: "Ivory shirt, denim or tailored trouser, cardigan jacket.",
+  },
+  {
+    id: "coffee",
+    name: "Coffee catch up",
+    description: "Denim, loafers, and a simple shirt with sleeves rolled.",
+  },
+  {
+    id: "dinner",
+    name: "Dinner out",
+    description: "Black knit, denim, loafers, structured bag.",
+  },
+];
 
 export default function Planner() {
-  const { data: outfits, loading: outfitsLoading, error: outfitsError } =
-    useFirebaseList("outfits");
-
-  const [planner, setPlanner] = useState({});
-  const [loadingPlanner, setLoadingPlanner] = useState(true);
-  const [plannerError, setPlannerError] = useState(null);
-
-  useEffect(() => {
-    const plannerRef = ref(db, "planner");
-    const unsubscribe = onValue(
-      plannerRef,
-      (snapshot) => {
-        const value = snapshot.val();
-        setPlanner(value || {});
-        setLoadingPlanner(false);
-      },
-      (err) => {
-        console.error(err);
-        setPlannerError(
-          "There was a problem loading your weekly planner configuration."
-        );
-        setLoadingPlanner(false);
-      }
-    );
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleChangeDay = async (day, outfitId) => {
-    try {
-      const plannerRef = ref(db, `planner/${day}`);
-      await set(plannerRef, outfitId || null);
-    } catch (err) {
-      console.error(err);
-      setPlannerError("There was a problem updating your planner.");
-    }
-  };
-
-  const outfitOptions = outfits.map((outfit) => (
-    <option value={outfit.id} key={outfit.id}>
-      {outfit.name}
-    </option>
-  ));
-
-  const rows = DAYS_OF_WEEK.map((day) => {
-    const assignedId = planner[day] || "";
-    const outfitName =
-      outfits.find((o) => o.id === assignedId)?.name || "No outfit selected";
-
-    return (
-      <tr key={day}>
-        <th scope="row">{day}</th>
-        <td>
-          <select
-            value={assignedId}
-            onChange={(event) => handleChangeDay(day, event.target.value)}
-            aria-label={`Outfit for ${day}`}
-          >
-            <option value="">None</option>
-            {outfitOptions}
-          </select>
-        </td>
-        <td className="planner-outfit-name">{outfitName}</td>
-      </tr>
-    );
+  const [plan, setPlan] = useState(() => {
+    const initial = {};
+    DAYS.forEach((day) => {
+      initial[day] = "none";
+    });
+    return initial;
   });
 
-  const loading = outfitsLoading || loadingPlanner;
-  const error = outfitsError || plannerError;
+  function handleChange(day, outfitId) {
+    setPlan((current) => ({
+      ...current,
+      [day]: outfitId,
+    }));
+  }
+
+  function outfitForId(id) {
+    return OUTIFT_BY_ID[id] || OUTIFT_BY_ID["none"];
+  }
+
+  const OUTIFT_BY_ID = OUTIFT_BY_ID_MAP;
 
   return (
-    <section aria-labelledby="planner-heading">
-      <div className="page-header">
-        <h2 id="planner-heading" className="page-title">
-          Weekly Planner
-        </h2>
-        <p className="page-description">
-          Assign saved outfits to days of the week to pre-plan your capsule
-          looks.
+    <section className="capsule-section">
+      <header className="capsule-section-header">
+        <h2 className="capsule-section-title">Weekly planner</h2>
+        <p className="capsule-section-copy">
+          Assign outfits to days of the week so you are not choosing under
+          pressure at 8am. This view is designed to feel like a simple
+          editorial planning board.
         </p>
-      </div>
+      </header>
 
-      {loading && <Spinner label="Loading outfits and planner..." />}
-      {error && <Alert type="error" message={error} />}
+      <section className="card capsule-planner-card">
+        <div className="capsule-planner-grid">
+          {DAYS.map((day) => {
+            const selectedId = plan[day];
+            const outfit = OUTIFT_BY_ID_MAP[selectedId] || OUTIFT_BY_ID_MAP["none"];
 
-      {!loading && !error && outfits.length === 0 && (
-        <p className="empty-state">
-          You have no saved outfits yet. Save some outfits first, then return
-          to the planner.
-        </p>
-      )}
-
-      {!loading && !error && outfits.length > 0 && (
-        <div className="card planner-card">
-          <table className="planner-table">
-            <caption className="visually-hidden">
-              Weekly outfit planner table
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Day</th>
-                <th scope="col">Select outfit</th>
-                <th scope="col">Current selection</th>
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </table>
+            return (
+              <div key={day} className="capsule-planner-day">
+                <h3>{day}</h3>
+                <select
+                  value={selectedId}
+                  onChange={(e) => handleChange(day, e.target.value)}
+                >
+                  {OUTFIT_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="capsule-planner-description">
+                  {outfit.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
-      )}
+
+        <footer className="capsule-planner-footer">
+          <p>
+            Tip: keep repeating outfits across the week. A true capsule is about
+            rewearing your best pieces, not filling the grid with something
+            different every single day.
+          </p>
+        </footer>
+      </section>
     </section>
   );
+}
+
+// Build a simple lookup so the JSX stays tidy
+const OUTIFT_BY_ID_MAP = OUTIFT_BY_ID_MAP_BUILDER();
+
+function OUTIFT_BY_ID_MAP_BUILDER() {
+  const map = {};
+  OUTFIT_OPTIONS.forEach((opt) => {
+    map[opt.id] = opt;
+  });
+  return map;
 }
